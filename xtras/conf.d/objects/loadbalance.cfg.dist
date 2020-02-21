@@ -1,0 +1,45 @@
+define host{
+	use		generic-host			; Inherit default values from a template
+	host_name	firewall			; The name we're giving to this switch
+	alias		Firewall			; A longer name associated with the switch
+	address		10.0.61.160			; IP address of the switch
+        check_command            check-host-alive
+        max_check_attempts       2
+        check_interval           1
+        notification_interval    1
+        notification_period      24x7
+        notification_options     d,u,r
+        contact_groups           admins
+	}
+
+
+
+define service{
+	use			generic-service			; Inherit values from a template
+	host_name		firewall			; The name of the host the service is associated with
+	service_description	PING				; The service description
+	check_command		check_ping!200.0,20%!600.0,60%	; The command used to monitor the service
+	normal_check_interval	5				; Check the service every 5 minutes under normal conditions
+	retry_check_interval	1				; Re-check the service every minute until its final/hard state is determined
+	}
+
+define service{
+        use                     generic-service 		; Inherit values from a template
+        host_name               firewall
+        service_description     Bandwidth Usage - Fast Ethernet 1
+	normal_check_interval   5
+	 check_command          check_local_mrtgtraf!/var/www/mrtg/10.0.61.160_fastethernet1.log!AVG!1000000,2000000!5000000,5000000!10
+        action_url              /pnp4nagios/graph?host=$HOSTNAME$&srv=$SERVICEDESC$
+        register                1
+
+}
+
+define service{
+	use			generic-service			; Inherit values from a template
+	host_name		firewall
+	service_description	Bandwidth Usage - Fast Ethernet 2
+	normal_check_interval   5
+	check_command		check_local_mrtgtraf!/var/www/mrtg/10.0.61.160_fastethernet2.log!AVG!1000000,2000000!5000000,5000000!10
+	action_url             /pnp4nagios/graph?host=$HOSTNAME$&srv=$SERVICEDESC$
+        register                1
+}
