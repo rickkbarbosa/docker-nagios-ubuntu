@@ -2,7 +2,7 @@
 ====================
 
 
-Ubuntu-Nagios Docker based
+Nagios+PNP4nagios Docker based
 
 
 
